@@ -13,7 +13,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import pages.GoogleStartPage;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,38 +25,48 @@ public class TestManager {
     private static String uniqValue;
     public static String uniqPhoneNumber;
 
-    // Create instance of Google Start page
-    protected GoogleStartPage googleStartPage;
-
     //Getting properties from Maven -D
     protected String os = System.getProperty("os").toLowerCase();
     protected String browser = System.getProperty("browser").toLowerCase();
+    protected String useGrid = System.getProperty("useGrid");
+
+
+    // Create instance of Google Start page
+    protected GoogleStartPage googleStartPage;
+
 
 
     @BeforeClass(alwaysRun = true)
     public void setUp() throws MalformedURLException {
-        DesiredCapabilities capabilities = null;
 
-        if(browser.contains("chrome")){
-            capabilities = DesiredCapabilities.chrome();
-        }else if(browser.contains("firefox")){
-            capabilities = DesiredCapabilities.firefox();
-        }else if(browser.contains("safari")){
-            capabilities = DesiredCapabilities.safari();
+        if(useGrid.equalsIgnoreCase("true")){
+            DesiredCapabilities capabilities = null;
+
+            if(browser.contains("chrome")){
+                capabilities = DesiredCapabilities.chrome();
+            }else if(browser.contains("firefox")){
+                capabilities = DesiredCapabilities.firefox();
+            }else if(browser.contains("safari")){
+                capabilities = DesiredCapabilities.safari();
+            }
+
+            switch (os){
+                case "mac":
+                    capabilities.setPlatform(Platform.MAC);
+                    break;
+                case "windows":
+                    capabilities.setPlatform(Platform.WINDOWS);
+                    break;
+                case "linux":
+                    capabilities.setPlatform(Platform.LINUX);
+                    break;
+            }
+            driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), capabilities);
+        }else{
+            System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedrivermac");
+            driver = new ChromeDriver();
         }
 
-        switch (os){
-            case "mac":
-                capabilities.setPlatform(Platform.MAC);
-                break;
-            case "windows":
-                capabilities.setPlatform(Platform.WINDOWS);
-                break;
-            case "linux":
-                capabilities.setPlatform(Platform.LINUX);
-        }
-
-        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), capabilities);
         driver.manage().window().setPosition(new Point(0, 0));
         driver.manage().window().setSize(new Dimension(1440, 900));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);

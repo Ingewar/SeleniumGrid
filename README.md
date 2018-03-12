@@ -12,6 +12,8 @@ To run this suite from command line you should install Maven first on your local
 
 To start suite from CLI run following command: `mvn clean test`.
 You could also specify OS and browser via `-D` flag. For example: `mvn clean test -Dos="Mac" -Dbrowser="chrome"`.
+Also you can run tests local by adding flag `-DuseGrid=false`.
+To run specific test add `-D` flag with class and test name like this: `mvn clean -Dtest=GoogleTests#openGoogleStartPage test -Dos=mac -Dbrowser=chrome -DuseGrid=false`.
 
 **Build With**
 

@@ -14,7 +14,6 @@ public class GoogleTests extends TestManager {
         System.out.println("=== "+ System.getProperty("os") +" ===");
         System.out.println("=== "+ System.getProperty("browser") +" ===");
 
-
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
