@@ -2,6 +2,7 @@ package conf;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -12,6 +13,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import pages.GoogleStartPage;
+import sun.security.krb5.internal.crypto.Des;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,40 +29,41 @@ public class TestManager {
     // Create instance of Google Start page
     protected GoogleStartPage googleStartPage;
 
+    //Getting properties from Maven -D
+    protected String os = System.getProperty("os").toLowerCase();
+    protected String browser = System.getProperty("browser").toLowerCase();
+
+
     @BeforeClass(alwaysRun = true)
     public void setUp() throws MalformedURLException {
-        String system = System.getProperty("os.name");
-        if(system.contains("Mac")) {
-            System.out.println(system + " was detected.");
-//            System.setProperty("webdriver.gecko.driver", "src/main/resources/geckodrivermac");
-            System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedrivermac");
-            System.out.println("Driver for " + system + " was set.");
-//            driver = new FirefoxDriver();
-            driver = new ChromeDriver();
+        DesiredCapabilities capabilities = null;
 
-//            Start remote driver on localhost
-//            DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
-//            desiredCapabilities.setPlatform(Platform.WINDOWS);
-//            driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), desiredCapabilities);
-//            driver.manage().window().setPosition(new Point(0, 0));
-//            driver.manage().window().setSize(new Dimension(1440, 900));
-        }else if(system.contains("Windows")){
-            System.out.println(system + " was detected.");
-            System.setProperty("webdriver.gecko.driver", "src/main/resources/geckodriver.exe");
-            driver= new FirefoxDriver();
-            driver.manage().window().maximize();
-        } else {
-            System.out.println(system + " was detected.");
-//            System.setProperty("webdriver.gecko.driver", "src/main/resources/geckodriverlinux");
-            System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriverlinux");
-            System.out.println("Driver for " + system + " was set.");
-            driver = new ChromeDriver();
-            driver.manage().window().setSize(new Dimension(1920,1080));//workaround for new Chrome update
-//            driver.manage().window().maximize();
+        if(browser.contains("chrome")){
+            capabilities = DesiredCapabilities.chrome();
+        }else if(browser.contains("firefox")){
+            capabilities = DesiredCapabilities.firefox();
+        }else if(browser.contains("safari")){
+            capabilities = DesiredCapabilities.safari();
         }
+
+        switch (os){
+            case "mac":
+                capabilities.setPlatform(Platform.MAC);
+                break;
+            case "windows":
+                capabilities.setPlatform(Platform.WINDOWS);
+                break;
+            case "linux":
+                capabilities.setPlatform(Platform.LINUX);
+        }
+
+        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), capabilities);
+        driver.manage().window().setPosition(new Point(0, 0));
+        driver.manage().window().setSize(new Dimension(1440, 900));
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         googleStartPage = new GoogleStartPage();
     }
+
 
     @BeforeMethod(alwaysRun = true)
     public void openBaseUrl(){
